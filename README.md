@@ -244,6 +244,46 @@ interact with the local filesystem.
 - [Local File Trigger](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.localfiletrigger/)
 - [Execute Command](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executecommand/)
 
+### Ollama Docker quick commands
+
+Use the Ollama service that matches your profile:
+
+- `ollama-cpu` for `--profile cpu`
+- `ollama-gpu` for `--profile gpu-nvidia`
+- `ollama-gpu-amd` for `--profile gpu-amd`
+
+Examples below use `ollama-cpu`. Replace it with your service if needed.
+
+List installed models:
+
+```bash
+docker compose exec ollama-cpu ollama list
+```
+
+Pull/install a model:
+
+```bash
+docker compose exec ollama-cpu ollama pull llama3.2
+```
+
+Run a quick prompt with a model:
+
+```bash
+docker compose exec ollama-cpu ollama run llama3.2 "Hello from Docker"
+```
+
+Show model details:
+
+```bash
+docker compose exec ollama-cpu ollama show llama3.2
+```
+
+Remove a model:
+
+```bash
+docker compose exec ollama-cpu ollama rm llama3.2
+```
+
 ## 📜 License
 
 This project is licensed under the Apache License 2.0 - see the
