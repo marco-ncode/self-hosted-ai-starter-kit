@@ -11,7 +11,9 @@
 
 {$QDRANT_DOMAIN} {
 	basicauth {
-		{$QDRANT_BASIC_AUTH_USER} {$QDRANT_BASIC_AUTH_HASH}
+		# Replace with your own user and bcrypt hash generated with:
+		# docker run --rm caddy:2 caddy hash-password --plaintext 'YOUR_PASSWORD'
+		admin $2a$14$INSERISCI_QUI_L_HASH
 	}
 
 	reverse_proxy qdrant:6333 {

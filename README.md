@@ -55,13 +55,21 @@ in your `.env` file:
 
 - `N8N_DOMAIN`
 - `QDRANT_DOMAIN`
-- `QDRANT_BASIC_AUTH_USER`
-- `QDRANT_BASIC_AUTH_HASH`
 
 To generate the password hash for Qdrant basic auth with Caddy:
 
 ```bash
 docker run --rm caddy:2 caddy hash-password --plaintext 'YOUR_PASSWORD'
+```
+
+Then edit the `basicauth` block in `Caddyfile` directly:
+
+```caddy
+{$QDRANT_DOMAIN} {
+	basicauth {
+		admin $2a$14$INSERISCI_QUI_L_HASH
+	}
+}
 ```
 
 ### Running n8n using Docker Compose
