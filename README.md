@@ -246,42 +246,29 @@ interact with the local filesystem.
 
 ### Ollama Docker quick commands
 
-Use the Ollama service that matches your profile:
-
-- `ollama-cpu` for `--profile cpu`
-- `ollama-gpu` for `--profile gpu-nvidia`
-- `ollama-gpu-amd` for `--profile gpu-amd`
-
-Examples below use `ollama-cpu`. Replace it with your service if needed.
-
-List installed models:
+Open a shell inside the running Ollama container:
 
 ```bash
-docker compose exec ollama-cpu ollama list
+docker exec -it ollama bash
 ```
 
-Pull/install a model:
+Then run these commands inside that shell:
 
 ```bash
-docker compose exec ollama-cpu ollama pull llama3.2
-```
+# List installed models
+ollama list
 
-Run a quick prompt with a model:
+# Pull/install a model
+ollama pull llama3.2
 
-```bash
-docker compose exec ollama-cpu ollama run llama3.2 "Hello from Docker"
-```
+# Run a quick prompt
+ollama run llama3.2 "Hello from Docker"
 
-Show model details:
+# Show model details
+ollama show llama3.2
 
-```bash
-docker compose exec ollama-cpu ollama show llama3.2
-```
-
-Remove a model:
-
-```bash
-docker compose exec ollama-cpu ollama rm llama3.2
+# Remove a model
+ollama rm llama3.2
 ```
 
 ## 📜 License
