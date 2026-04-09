@@ -45,6 +45,22 @@ cd self-hosted-ai-starter-kit
 cp .env.example .env # you should update secrets and passwords inside
 ```
 
+### Optional: expose n8n and Qdrant via Caddy
+
+If you want to expose n8n and Qdrant on public domains, configure these values
+in your `.env` file:
+
+- `N8N_DOMAIN`
+- `QDRANT_DOMAIN`
+- `QDRANT_BASIC_AUTH_USER`
+- `QDRANT_BASIC_AUTH_HASH`
+
+To generate the password hash for Qdrant basic auth with Caddy:
+
+```bash
+docker run --rm caddy:2 caddy hash-password --plaintext 'YOUR_PASSWORD'
+```
+
 ### Running n8n using Docker Compose
 
 #### For Nvidia GPU users
