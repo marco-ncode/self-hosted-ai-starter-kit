@@ -3,6 +3,8 @@ volumes:
   postgres_storage:
   ollama_storage:
   qdrant_storage:
+  caddy_data:
+  caddy_config:
 
 networks:
   demo:
@@ -20,6 +22,11 @@ x-n8n: &service-n8n
     - N8N_ENCRYPTION_KEY
     - N8N_USER_MANAGEMENT_JWT_SECRET
     - OLLAMA_HOST=${OLLAMA_HOST:-ollama:11434}
+    - N8N_HOST=${N8N_DOMAIN:-localhost}
+    - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+    - N8N_PORT=5678
+    - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678/}
+    - N8N_EDITOR_BASE_URL=${N8N_EDITOR_BASE_URL:-http://localhost:5678/}
   env_file:
     - path: .env
       required: true
@@ -48,6 +55,21 @@ x-init-ollama: &init-ollama
     - "sleep 3; ollama pull llama3.2"
 
 services:
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    networks: ['demo']
+    ports:
+      - 80:80
+      - 443:443
+    env_file:
+      - .env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
   postgres:
     image: postgres:16-alpine
     hostname: postgres

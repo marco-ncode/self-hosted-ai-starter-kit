@@ -1,0 +1,24 @@
+{$N8N_DOMAIN} {
+	reverse_proxy n8n:5678 {
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-Host {host}
+		flush_interval -1
+	}
+}
+
+{$QDRANT_DOMAIN} {
+	basicauth {
+		{$QDRANT_BASIC_AUTH_USER} {$QDRANT_BASIC_AUTH_HASH}
+	}
+
+	reverse_proxy qdrant:6333 {
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-Host {host}
+	}
+}
