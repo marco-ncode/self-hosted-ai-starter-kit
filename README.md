@@ -43,7 +43,7 @@ support for exposing n8n and Qdrant on public domains.
 ### Cloning the Repository
 
 ```bash
-git clone https://github.com/n8n-io/self-hosted-ai-starter-kit.git
+git clone https://github.com/marco-ncode/self-hosted-ai-starter-kit.git
 cd self-hosted-ai-starter-kit
 cp .env.example .env # you should update secrets and passwords inside
 ```
@@ -69,7 +69,7 @@ docker run --rm caddy:2 caddy hash-password --plaintext 'YOUR_PASSWORD'
 #### For Nvidia GPU users
 
 ```bash
-git clone https://github.com/n8n-io/self-hosted-ai-starter-kit.git
+git clone https://github.com/marco-ncode/self-hosted-ai-starter-kit.git
 cd self-hosted-ai-starter-kit
 cp .env.example .env # you should update secrets and passwords inside
 docker compose --profile gpu-nvidia up
@@ -82,7 +82,7 @@ docker compose --profile gpu-nvidia up
 ### For AMD GPU users on Linux
 
 ```bash
-git clone https://github.com/n8n-io/self-hosted-ai-starter-kit.git
+git clone https://github.com/marco-ncode/self-hosted-ai-starter-kit.git
 cd self-hosted-ai-starter-kit
 cp .env.example .env # you should update secrets and passwords inside
 docker compose --profile gpu-amd up
@@ -103,7 +103,7 @@ If you want to run Ollama on your mac, check the
 for installation instructions, and run the starter kit as follows:
 
 ```bash
-git clone https://github.com/n8n-io/self-hosted-ai-starter-kit.git
+git clone https://github.com/marco-ncode/self-hosted-ai-starter-kit.git
 cd self-hosted-ai-starter-kit
 cp .env.example .env # you should update secrets and passwords inside
 docker compose up
@@ -123,7 +123,7 @@ If you're running OLLAMA locally on your Mac (not in Docker), you need to modify
 #### For everyone else
 
 ```bash
-git clone https://github.com/n8n-io/self-hosted-ai-starter-kit.git
+git clone https://github.com/marco-ncode/self-hosted-ai-starter-kit.git
 cd self-hosted-ai-starter-kit
 cp .env.example .env # you should update secrets and passwords inside
 docker compose --profile cpu up
