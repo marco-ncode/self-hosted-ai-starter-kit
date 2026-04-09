@@ -25,6 +25,9 @@ store with an comprehensive API
 ✅ [**PostgreSQL**](https://www.postgresql.org/) -  Workhorse of the Data
 Engineering world, handles large amounts of data safely.
 
+✅ [**Caddy**](https://caddyserver.com/) - Reverse proxy with automatic HTTPS
+support for exposing n8n and Qdrant on public domains.
+
 ### What you can build
 
 ⭐️ **AI Agents** for scheduling appointments
