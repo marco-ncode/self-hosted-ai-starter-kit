@@ -28,6 +28,8 @@ Engineering world, handles large amounts of data safely.
 ✅ [**Caddy**](https://caddyserver.com/) - Reverse proxy with automatic HTTPS
 support for exposing n8n and Qdrant on public domains.
 
+✅ [**Supabase (self-hosted)**](https://supabase.com/docs/guides/hosting/docker) - Open-source backend stack (Postgres, Auth, REST, Realtime, Storage, Studio).
+
 ### What you can build
 
 ⭐️ **AI Agents** for scheduling appointments
@@ -71,6 +73,49 @@ Then edit the `basicauth` block in `Caddyfile` directly:
 	}
 }
 ```
+
+### Optional: enable Supabase stack (with Caddy protection)
+
+This repo includes [`docker-compose.supabase.yml`](docker-compose.supabase.yml) with a Supabase core stack:
+
+- `supabase-db`
+- `supabase-auth`
+- `supabase-rest`
+- `supabase-realtime`
+- `supabase-storage`
+- `supabase-meta`
+- `supabase-studio`
+- `supabase-kong`
+- `supabase-imgproxy`
+
+Set these values in `.env` before starting:
+
+- `SUPABASE_DOMAIN`
+- `SUPABASE_PUBLIC_URL`
+- `SUPABASE_SITE_URL`
+- `SUPABASE_POSTGRES_PASSWORD`
+- `SUPABASE_JWT_SECRET`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_SECRET_KEY_BASE`
+
+You can generate base secrets quickly:
+
+```bash
+openssl rand -base64 48   # SUPABASE_JWT_SECRET
+openssl rand -base64 48   # SUPABASE_SECRET_KEY_BASE
+```
+
+Then set `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` with JWT tokens signed using `SUPABASE_JWT_SECRET`.
+
+Start the main stack + Supabase (CPU example):
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.supabase.yml --profile cpu --profile supabase up -d
+```
+
+Supabase API gateway will be available on `:8000` and protected through Caddy on `SUPABASE_DOMAIN`.
+Edit the `{$SUPABASE_DOMAIN}` `basicauth` block in [Caddyfile](Caddyfile) to set your own user/password hash.
 
 ### Running n8n using Docker Compose
 

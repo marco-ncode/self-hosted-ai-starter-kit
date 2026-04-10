@@ -1,0 +1,51 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: auth-v1
+    url: http://supabase-auth:9999/
+    routes:
+      - name: auth-v1-route
+        paths:
+          - /auth/v1/
+        strip_path: true
+
+  - name: rest-v1
+    url: http://supabase-rest:3000/
+    routes:
+      - name: rest-v1-route
+        paths:
+          - /rest/v1/
+        strip_path: true
+
+  - name: realtime-v1
+    url: http://supabase-realtime:4000/socket/
+    routes:
+      - name: realtime-v1-route
+        paths:
+          - /realtime/v1/
+        strip_path: true
+
+  - name: storage-v1
+    url: http://supabase-storage:5000/
+    routes:
+      - name: storage-v1-route
+        paths:
+          - /storage/v1/
+        strip_path: true
+
+  - name: meta-v1
+    url: http://supabase-meta:8080/
+    routes:
+      - name: meta-v1-route
+        paths:
+          - /pg/
+        strip_path: true
+
+  - name: studio
+    url: http://supabase-studio:3000/
+    routes:
+      - name: studio-route
+        paths:
+          - /
+        strip_path: false

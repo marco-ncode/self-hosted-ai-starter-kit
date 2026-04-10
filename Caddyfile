@@ -24,3 +24,19 @@
 		header_up X-Forwarded-Host {host}
 	}
 }
+
+{$SUPABASE_DOMAIN} {
+	basicauth {
+		# Replace with your own user and bcrypt hash generated with:
+		# docker run --rm caddy:2 caddy hash-password --plaintext 'YOUR_PASSWORD'
+		admin $2a$14$INSERISCI_QUI_L_HASH
+	}
+
+	reverse_proxy supabase-kong:8000 {
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-Host {host}
+	}
+}

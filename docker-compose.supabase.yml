@@ -1,0 +1,239 @@
+volumes:
+  supabase_db_data:
+  supabase_storage_data:
+
+networks:
+  demo:
+
+services:
+  supabase-studio:
+    profiles: ["supabase"]
+    image: supabase/studio:2026.04.08-sha-205cbe7
+    container_name: supabase-studio
+    restart: unless-stopped
+    networks: ['demo']
+    env_file:
+      - path: .env
+        required: true
+    environment:
+      - HOSTNAME=0.0.0.0
+      - STUDIO_PG_META_URL=http://supabase-meta:8080
+      - SUPABASE_URL=http://supabase-kong:8000
+      - SUPABASE_PUBLIC_URL=${SUPABASE_PUBLIC_URL:-http://localhost:8000}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - AUTH_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - POSTGRES_HOST=supabase-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${SUPABASE_POSTGRES_DB:-postgres}
+      - POSTGRES_PASSWORD=${SUPABASE_POSTGRES_PASSWORD}
+      - DEFAULT_ORGANIZATION_NAME=${SUPABASE_STUDIO_DEFAULT_ORG:-Self-Hosted}
+      - DEFAULT_PROJECT_NAME=${SUPABASE_STUDIO_DEFAULT_PROJECT:-Starter}
+      - DASHBOARD_USERNAME=${SUPABASE_DASHBOARD_USERNAME:-supabase}
+      - DASHBOARD_PASSWORD=${SUPABASE_DASHBOARD_PASSWORD:-this_password_is_insecure_and_should_be_updated}
+    depends_on:
+      supabase-meta:
+        condition: service_started
+
+  supabase-kong:
+    profiles: ["supabase"]
+    image: kong/kong:3.9.1
+    container_name: supabase-kong
+    restart: unless-stopped
+    networks: ['demo']
+    ports:
+      - 8000:8000
+      - 8443:8443
+    volumes:
+      - ./supabase/kong.yml:/usr/local/kong/declarative/kong.yml:ro
+    environment:
+      - KONG_DATABASE=off
+      - KONG_DECLARATIVE_CONFIG=/usr/local/kong/declarative/kong.yml
+      - KONG_LOG_LEVEL=warn
+      - KONG_DNS_ORDER=LAST,A,CNAME
+      - KONG_PLUGINS=request-transformer,cors,key-auth,acl,basic-auth,request-termination,ip-restriction
+    depends_on:
+      supabase-auth:
+        condition: service_started
+      supabase-rest:
+        condition: service_started
+      supabase-realtime:
+        condition: service_started
+      supabase-storage:
+        condition: service_started
+      supabase-meta:
+        condition: service_started
+      supabase-studio:
+        condition: service_started
+
+  supabase-auth:
+    profiles: ["supabase"]
+    image: supabase/gotrue:v2.186.0
+    container_name: supabase-auth
+    restart: unless-stopped
+    networks: ['demo']
+    env_file:
+      - path: .env
+        required: true
+    environment:
+      - GOTRUE_API_HOST=0.0.0.0
+      - GOTRUE_API_PORT=9999
+      - API_EXTERNAL_URL=${SUPABASE_PUBLIC_URL:-http://localhost:8000}
+      - GOTRUE_SITE_URL=${SUPABASE_SITE_URL:-http://localhost:3000}
+      - GOTRUE_URI_ALLOW_LIST=${SUPABASE_ADDITIONAL_REDIRECT_URLS:-}
+      - GOTRUE_DB_DRIVER=postgres
+      - GOTRUE_DB_DATABASE_URL=postgres://postgres:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
+      - GOTRUE_DISABLE_SIGNUP=${SUPABASE_DISABLE_SIGNUP:-false}
+      - GOTRUE_JWT_ADMIN_ROLES=service_role
+      - GOTRUE_JWT_AUD=authenticated
+      - GOTRUE_JWT_DEFAULT_GROUP_NAME=authenticated
+      - GOTRUE_JWT_EXP=${SUPABASE_JWT_EXPIRY:-3600}
+      - GOTRUE_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - GOTRUE_EXTERNAL_EMAIL_ENABLED=${SUPABASE_ENABLE_EMAIL_SIGNUP:-true}
+      - GOTRUE_MAILER_AUTOCONFIRM=${SUPABASE_ENABLE_EMAIL_AUTOCONFIRM:-true}
+      - GOTRUE_EXTERNAL_PHONE_ENABLED=${SUPABASE_ENABLE_PHONE_SIGNUP:-false}
+      - GOTRUE_SMS_AUTOCONFIRM=${SUPABASE_ENABLE_PHONE_AUTOCONFIRM:-false}
+      - GOTRUE_SMTP_ADMIN_EMAIL=${SUPABASE_SMTP_ADMIN_EMAIL:-admin@example.com}
+      - GOTRUE_SMTP_HOST=${SUPABASE_SMTP_HOST:-smtp.example.com}
+      - GOTRUE_SMTP_PORT=${SUPABASE_SMTP_PORT:-587}
+      - GOTRUE_SMTP_USER=${SUPABASE_SMTP_USER:-}
+      - GOTRUE_SMTP_PASS=${SUPABASE_SMTP_PASS:-}
+      - GOTRUE_SMTP_SENDER_NAME=${SUPABASE_SMTP_SENDER_NAME:-Supabase}
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+
+  supabase-rest:
+    profiles: ["supabase"]
+    image: postgrest/postgrest:v14.8
+    container_name: supabase-rest
+    restart: unless-stopped
+    networks: ['demo']
+    env_file:
+      - path: .env
+        required: true
+    environment:
+      - PGRST_DB_URI=postgres://postgres:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
+      - PGRST_DB_SCHEMAS=${SUPABASE_PGRST_DB_SCHEMAS:-public,storage,graphql_public}
+      - PGRST_DB_ANON_ROLE=anon
+      - PGRST_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - PGRST_DB_USE_LEGACY_GUCS=false
+      - PGRST_APP_SETTINGS_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - PGRST_APP_SETTINGS_JWT_EXP=${SUPABASE_JWT_EXPIRY:-3600}
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+
+  supabase-realtime:
+    profiles: ["supabase"]
+    image: supabase/realtime:v2.76.5
+    container_name: supabase-realtime
+    restart: unless-stopped
+    networks: ['demo']
+    env_file:
+      - path: .env
+        required: true
+    environment:
+      - APP_NAME=supabase-realtime
+      - PORT=4000
+      - DB_HOST=supabase-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=${SUPABASE_POSTGRES_PASSWORD}
+      - DB_NAME=${SUPABASE_POSTGRES_DB:-postgres}
+      - DB_ENC_KEY=${SUPABASE_DB_ENC_KEY:-supabase_realtime_enc_key_32_chars}
+      - API_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - SECRET_KEY_BASE=${SUPABASE_SECRET_KEY_BASE:-supabase_secret_key_base_change_me_1234567890}
+      - ERL_AFLAGS=-proto_dist inet_tcp
+      - DNS_NODES=''
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+
+  supabase-storage:
+    profiles: ["supabase"]
+    image: supabase/storage-api:v1.48.26
+    container_name: supabase-storage
+    restart: unless-stopped
+    networks: ['demo']
+    volumes:
+      - supabase_storage_data:/var/lib/storage
+    env_file:
+      - path: .env
+        required: true
+    environment:
+      - ANON_KEY=${SUPABASE_ANON_KEY}
+      - SERVICE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - POSTGREST_URL=http://supabase-rest:3000
+      - PGRST_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - DATABASE_URL=postgres://postgres:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
+      - FILE_SIZE_LIMIT=${SUPABASE_FILE_SIZE_LIMIT:-52428800}
+      - STORAGE_BACKEND=file
+      - FILE_STORAGE_BACKEND_PATH=/var/lib/storage
+      - TENANT_ID=stub
+      - REGION=stub
+      - GLOBAL_S3_BUCKET=stub
+      - ENABLE_IMAGE_TRANSFORMATION=true
+      - IMGPROXY_URL=http://supabase-imgproxy:5001
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+      supabase-rest:
+        condition: service_started
+
+  supabase-imgproxy:
+    profiles: ["supabase"]
+    image: darthsim/imgproxy:v3.30.1
+    container_name: supabase-imgproxy
+    restart: unless-stopped
+    networks: ['demo']
+    volumes:
+      - supabase_storage_data:/var/lib/storage
+    environment:
+      - IMGPROXY_BIND=:5001
+      - IMGPROXY_LOCAL_FILESYSTEM_ROOT=/var/lib/storage
+      - IMGPROXY_USE_ETAG=true
+
+  supabase-meta:
+    profiles: ["supabase"]
+    image: supabase/postgres-meta:v0.96.3
+    container_name: supabase-meta
+    restart: unless-stopped
+    networks: ['demo']
+    env_file:
+      - path: .env
+        required: true
+    environment:
+      - PG_META_PORT=8080
+      - PG_META_DB_HOST=supabase-db
+      - PG_META_DB_PORT=5432
+      - PG_META_DB_NAME=${SUPABASE_POSTGRES_DB:-postgres}
+      - PG_META_DB_USER=postgres
+      - PG_META_DB_PASSWORD=${SUPABASE_POSTGRES_PASSWORD}
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+
+  supabase-db:
+    profiles: ["supabase"]
+    image: supabase/postgres:15.8.1.085
+    container_name: supabase-db
+    restart: unless-stopped
+    networks: ['demo']
+    ports:
+      - 54322:5432
+    env_file:
+      - path: .env
+        required: true
+    environment:
+      - POSTGRES_DB=${SUPABASE_POSTGRES_DB:-postgres}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${SUPABASE_POSTGRES_PASSWORD}
+    volumes:
+      - ./supabase/init/01-roles.sql:/docker-entrypoint-initdb.d/init-scripts/01-roles.sql:ro
+      - supabase_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U postgres -d ${SUPABASE_POSTGRES_DB:-postgres}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
