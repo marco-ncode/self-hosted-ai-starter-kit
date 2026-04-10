@@ -99,14 +99,15 @@ Set these values in `.env` before starting:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_SECRET_KEY_BASE`
 
-You can generate base secrets quickly:
+Generate Supabase keys and secrets with:
 
 ```bash
-openssl rand -base64 48   # SUPABASE_JWT_SECRET
-openssl rand -base64 48   # SUPABASE_SECRET_KEY_BASE
+sh supabase/generate-keys.sh --update-env
 ```
 
-Then set `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` with JWT tokens signed using `SUPABASE_JWT_SECRET`.
+This updates your local `.env` with `SUPABASE_JWT_SECRET`, `SUPABASE_ANON_KEY`,
+`SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_SECRET_KEY_BASE`, `SUPABASE_POSTGRES_PASSWORD`,
+`SUPABASE_DASHBOARD_PASSWORD`, and `SUPABASE_DB_ENC_KEY`.
 
 Start the main stack + Supabase (CPU example):
 
