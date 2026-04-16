@@ -23,4 +23,8 @@ BEGIN
   END IF;
 END
 \$\$;
+
+CREATE SCHEMA IF NOT EXISTS _realtime;
+GRANT USAGE, CREATE ON SCHEMA _realtime TO supabase_admin;
+ALTER ROLE supabase_admin SET search_path = _realtime;
 SQL

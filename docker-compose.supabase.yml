@@ -82,7 +82,7 @@ services:
       - GOTRUE_SITE_URL=${SUPABASE_SITE_URL:-http://localhost:3000}
       - GOTRUE_URI_ALLOW_LIST=${SUPABASE_ADDITIONAL_REDIRECT_URLS:-}
       - GOTRUE_DB_DRIVER=postgres
-      - GOTRUE_DB_DATABASE_URL=postgres://supabase_auth_admin:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
+      - GOTRUE_DB_DATABASE_URL=postgres://supabase_admin:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
       - GOTRUE_DISABLE_SIGNUP=${SUPABASE_DISABLE_SIGNUP:-false}
       - GOTRUE_JWT_ADMIN_ROLES=service_role
       - GOTRUE_JWT_AUD=authenticated
@@ -113,7 +113,7 @@ services:
       - path: .env
         required: true
     environment:
-      - PGRST_DB_URI=postgres://authenticator:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
+      - PGRST_DB_URI=postgres://supabase_admin:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
       - PGRST_DB_SCHEMAS=${SUPABASE_PGRST_DB_SCHEMAS:-public,storage,graphql_public}
       - PGRST_DB_ANON_ROLE=anon
       - PGRST_JWT_SECRET=${SUPABASE_JWT_SECRET}
@@ -167,7 +167,7 @@ services:
       - SERVICE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       - POSTGREST_URL=http://supabase-rest:3000
       - AUTH_JWT_SECRET=${SUPABASE_JWT_SECRET}
-      - DATABASE_URL=postgres://supabase_storage_admin:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
+      - DATABASE_URL=postgres://supabase_admin:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
       - FILE_SIZE_LIMIT=${SUPABASE_FILE_SIZE_LIMIT:-52428800}
       - STORAGE_BACKEND=file
       - FILE_STORAGE_BACKEND_PATH=/var/lib/storage
@@ -233,7 +233,6 @@ services:
     volumes:
       - ./supabase/init/00-supabase-admin.sh:/docker-entrypoint-initdb.d/00-supabase-admin.sh:ro
       - ./supabase/init/01-roles.sql:/docker-entrypoint-initdb.d/01-roles.sql:ro
-      - ./supabase/init/999-set-role-passwords.sh:/docker-entrypoint-initdb.d/init-scripts/999-set-role-passwords.sh:ro
       - supabase_db_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U postgres -d ${SUPABASE_POSTGRES_DB:-postgres}']
