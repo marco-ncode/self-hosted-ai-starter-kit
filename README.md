@@ -118,6 +118,23 @@ docker compose -f docker-compose.yml -f docker-compose.supabase.yml --profile cp
 Supabase API gateway will be available on `:8000` and protected through Caddy on `SUPABASE_DOMAIN`.
 Edit the `{$SUPABASE_DOMAIN}` `basicauth` block in [Caddyfile](Caddyfile) to set your own user/password hash.
 
+### Using Supabase from n8n (Kong credentials)
+
+For n8n workflows running inside Docker, prefer the internal Kong URL:
+
+- Base URL: `http://supabase-kong:8000`
+- Headers:
+  - `apikey: <SUPABASE_SERVICE_ROLE_KEY>`
+  - `Authorization: Bearer <SUPABASE_SERVICE_ROLE_KEY>`
+
+Example endpoints:
+
+- `GET http://supabase-kong:8000/auth/v1/health`
+- `GET http://supabase-kong:8000/rest/v1/<table>?select=*`
+- `http://supabase-kong:8000/storage/v1/...`
+
+If you use the public domain (`https://SUPABASE_DOMAIN`) from outside Docker, add Caddy Basic Auth credentials in addition to the headers above.
+
 ### VPS deployment (validated flow)
 
 This is the recommended flow for a Linux VPS deployment on branch `w_supabase`:
