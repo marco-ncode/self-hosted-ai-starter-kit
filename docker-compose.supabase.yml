@@ -82,7 +82,7 @@ services:
       - GOTRUE_SITE_URL=${SUPABASE_SITE_URL:-http://localhost:3000}
       - GOTRUE_URI_ALLOW_LIST=${SUPABASE_ADDITIONAL_REDIRECT_URLS:-}
       - GOTRUE_DB_DRIVER=postgres
-      - GOTRUE_DB_DATABASE_URL=postgres://postgres:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
+      - GOTRUE_DB_DATABASE_URL=postgres://supabase_auth_admin:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
       - GOTRUE_DISABLE_SIGNUP=${SUPABASE_DISABLE_SIGNUP:-false}
       - GOTRUE_JWT_ADMIN_ROLES=service_role
       - GOTRUE_JWT_AUD=authenticated
@@ -113,7 +113,7 @@ services:
       - path: .env
         required: true
     environment:
-      - PGRST_DB_URI=postgres://postgres:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
+      - PGRST_DB_URI=postgres://authenticator:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
       - PGRST_DB_SCHEMAS=${SUPABASE_PGRST_DB_SCHEMAS:-public,storage,graphql_public}
       - PGRST_DB_ANON_ROLE=anon
       - PGRST_JWT_SECRET=${SUPABASE_JWT_SECRET}
@@ -138,7 +138,7 @@ services:
       - PORT=4000
       - DB_HOST=supabase-db
       - DB_PORT=5432
-      - DB_USER=postgres
+      - DB_USER=supabase_admin
       - DB_PASSWORD=${SUPABASE_POSTGRES_PASSWORD}
       - DB_NAME=${SUPABASE_POSTGRES_DB:-postgres}
       - DB_AFTER_CONNECT_QUERY=SET search_path TO _realtime
@@ -166,8 +166,8 @@ services:
       - ANON_KEY=${SUPABASE_ANON_KEY}
       - SERVICE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       - POSTGREST_URL=http://supabase-rest:3000
-      - PGRST_JWT_SECRET=${SUPABASE_JWT_SECRET}
-      - DATABASE_URL=postgres://postgres:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
+      - AUTH_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - DATABASE_URL=postgres://supabase_storage_admin:${SUPABASE_POSTGRES_PASSWORD}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-postgres}
       - FILE_SIZE_LIMIT=${SUPABASE_FILE_SIZE_LIMIT:-52428800}
       - STORAGE_BACKEND=file
       - FILE_STORAGE_BACKEND_PATH=/var/lib/storage
