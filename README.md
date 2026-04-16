@@ -118,6 +118,40 @@ docker compose -f docker-compose.yml -f docker-compose.supabase.yml --profile cp
 Supabase API gateway will be available on `:8000` and protected through Caddy on `SUPABASE_DOMAIN`.
 Edit the `{$SUPABASE_DOMAIN}` `basicauth` block in [Caddyfile](Caddyfile) to set your own user/password hash.
 
+### VPS deployment (validated flow)
+
+This is the recommended flow for a Linux VPS deployment on branch `w_supabase`:
+
+```bash
+git pull origin w_supabase
+cp .env.example .env # first setup only
+sh supabase/generate-keys.sh --update-env
+docker compose -f docker-compose.yml -f docker-compose.supabase.yml --profile cpu --profile supabase up -d
+```
+
+If you change files under `supabase/init/` or change Supabase DB users/passwords,
+reset Supabase volumes before restarting:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.supabase.yml --profile cpu --profile supabase down
+docker volume rm self-hosted-ai-starter-kit_supabase_db_data self-hosted-ai-starter-kit_supabase_storage_data
+docker compose -f docker-compose.yml -f docker-compose.supabase.yml --profile cpu --profile supabase up -d
+```
+
+Quick health checks:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.supabase.yml --profile cpu --profile supabase ps
+docker compose -f docker-compose.yml -f docker-compose.supabase.yml --profile cpu --profile supabase logs --tail=120 supabase-db supabase-auth supabase-rest supabase-realtime supabase-storage
+```
+
+### Supabase troubleshooting (common issues)
+
+- `password authentication failed for user ...`: regenerate `.env` secrets and reset Supabase volumes.
+- `schema_migrations` errors in `supabase-realtime`: use the latest `w_supabase` branch and reset Supabase volumes.
+- `permission denied for schema auth/storage`: ensure you're on updated `w_supabase`, then perform a full Supabase volume reset.
+- `supabase-kong` or `supabase-studio` showing `health: starting` for a short time is expected right after bootstrap.
+
 ### Running n8n using Docker Compose
 
 #### For Nvidia GPU users
