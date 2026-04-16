@@ -48,6 +48,14 @@ cd self-hosted-ai-starter-kit
 cp .env.example .env # you should update secrets and passwords inside
 ```
 
+> [!NOTE]
+> The `main` branch contains the base n8n/Ollama/Qdrant stack.
+> If you need the Supabase-enabled version, use the `w_supabase` branch:
+>
+> ```bash
+> git clone -b w_supabase https://github.com/marco-ncode/self-hosted-ai-starter-kit.git
+> ```
+
 ### Optional: expose n8n and Qdrant via Caddy
 
 If you want to expose n8n and Qdrant on public domains, configure these values
