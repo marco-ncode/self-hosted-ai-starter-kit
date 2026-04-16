@@ -230,6 +230,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${SUPABASE_POSTGRES_PASSWORD}
     volumes:
+      - ./supabase/init/00-supabase-admin.sh:/docker-entrypoint-initdb.d/00-supabase-admin.sh:ro
       - ./supabase/init/01-roles.sql:/docker-entrypoint-initdb.d/01-roles.sql:ro
       - supabase_db_data:/var/lib/postgresql/data
     healthcheck:
