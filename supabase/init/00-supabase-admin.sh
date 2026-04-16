@@ -7,7 +7,7 @@ supabase_admin_password_escaped=$(printf "%s" "${POSTGRES_PASSWORD}" | sed "s/'/
 psql -v ON_ERROR_STOP=1 \
   --username "${POSTGRES_USER:-postgres}" \
   --dbname "${POSTGRES_DB:-postgres}" <<SQL
-DO $$
+DO \$\$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'supabase_admin') THEN
     EXECUTE format(
@@ -22,5 +22,5 @@ BEGIN
     ALTER ROLE supabase_admin WITH LOGIN SUPERUSER;
   END IF;
 END
-$$;
+\$\$;
 SQL
