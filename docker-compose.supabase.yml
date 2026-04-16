@@ -141,6 +141,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=${SUPABASE_POSTGRES_PASSWORD}
       - DB_NAME=${SUPABASE_POSTGRES_DB:-postgres}
+      - DB_AFTER_CONNECT_QUERY=SET search_path TO _realtime
       - DB_ENC_KEY=${SUPABASE_DB_ENC_KEY:-supabase_realtime_enc_key_32_chars}
       - API_JWT_SECRET=${SUPABASE_JWT_SECRET}
       - SECRET_KEY_BASE=${SUPABASE_SECRET_KEY_BASE:-supabase_secret_key_base_change_me_1234567890}
