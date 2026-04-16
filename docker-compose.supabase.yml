@@ -230,7 +230,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${SUPABASE_POSTGRES_PASSWORD}
     volumes:
-      - ./supabase/init/01-roles.sql:/docker-entrypoint-initdb.d/init-scripts/01-roles.sql:ro
+      - ./supabase/init/01-roles.sql:/docker-entrypoint-initdb.d/01-roles.sql:ro
       - supabase_db_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U postgres -d ${SUPABASE_POSTGRES_DB:-postgres}']
