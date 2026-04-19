@@ -25,6 +25,8 @@ store with an comprehensive API
 ✅ [**PostgreSQL**](https://www.postgresql.org/) -  Workhorse of the Data
 Engineering world, handles large amounts of data safely.
 
+✅ [**Redis**](https://redis.io/) - Queue broker used by n8n for scalable execution workers.
+
 ✅ [**Caddy**](https://caddyserver.com/) - Reverse proxy with automatic HTTPS
 support for exposing n8n and Qdrant on public domains.
 
@@ -160,6 +162,16 @@ After completing the installation steps above, simply follow the steps below to 
    console logs to check on the progress.
 
 To open n8n at any time, visit <http://localhost:5678/> in your browser.
+
+Queue execution is enabled by default in this branch: the main `n8n` service
+handles UI/webhooks while `n8n-worker` executes jobs from Redis.
+
+Useful checks:
+
+```bash
+docker compose logs -f redis n8n n8n-worker
+docker compose exec redis redis-cli ping
+```
 
 With your n8n instance, you’ll have access to over 400 integrations and a
 suite of basic and advanced AI nodes such as

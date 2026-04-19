@@ -3,6 +3,7 @@ volumes:
   postgres_storage:
   ollama_storage:
   qdrant_storage:
+  redis_storage:
   caddy_data:
   caddy_config:
 
@@ -27,6 +28,12 @@ x-n8n: &service-n8n
     - N8N_PORT=5678
     - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678/}
     - N8N_EDITOR_BASE_URL=${N8N_EDITOR_BASE_URL:-http://localhost:5678/}
+    - EXECUTIONS_MODE=queue
+    - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=${OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS:-true}
+    - QUEUE_BULL_REDIS_HOST=redis
+    - QUEUE_BULL_REDIS_PORT=6379
+    - QUEUE_BULL_REDIS_DB=${QUEUE_BULL_REDIS_DB:-0}
+    - QUEUE_BULL_REDIS_PASSWORD=${QUEUE_BULL_REDIS_PASSWORD:-}
   env_file:
     - path: .env
       required: true
@@ -87,6 +94,21 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    hostname: redis
+    container_name: redis
+    networks: ['demo']
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redis_storage:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   n8n-import:
     <<: *service-n8n
     hostname: n8n-import
@@ -106,6 +128,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
 
   n8n:
     <<: *service-n8n
@@ -123,6 +147,25 @@ services:
         condition: service_healthy
       n8n-import:
         condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  n8n-worker:
+    <<: *service-n8n
+    hostname: n8n-worker
+    container_name: n8n-worker
+    restart: unless-stopped
+    command: ['worker', '--concurrency=${N8N_WORKER_CONCURRENCY:-10}']
+    volumes:
+      - n8n_storage:/home/node/.n8n
+      - ./shared:/data/shared
+    depends_on:
+      postgres:
+        condition: service_healthy
+      n8n-import:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
 
   qdrant:
     image: qdrant/qdrant
